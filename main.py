@@ -4,6 +4,9 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
 
 
 def load_csv(path: str) -> pd.DataFrame:
@@ -23,15 +26,37 @@ def standardize_data(data: pd.DataFrame) -> np.ndarray:
 if __name__ == "__main__":
     path_to_data = "heart.csv"
     heart_data = load_csv(path_to_data)
-
-    hist_plot(heart_data["age"])
-
-    column_list = ["age", "caa", "chol"]
-    stdandardized_columns = standardize_data(heart_data[column_list])
-
-    hist_plot(stdandardized_columns[:, column_list.index("age")])
     
-    plt.show()
+    feature_columns = [column_name for column_name in heart_data.columns if column_name != 'output']
+
+    stdandardized_columns = standardize_data(heart_data[feature_columns])
+    
+    X_train, X_test, y_train, y_test = train_test_split(stdandardized_columns, heart_data['output'],
+                                                        test_size=0.2, random_state=10)
+    
+
+    # print(f'x_train: {np.shape(X_train)}')
+    # print(f'x_test: {np.shape(X_test)}')
+
+    classifer = KNeighborsClassifier(n_neighbors=10)
+    classifer.fit(X_train, y_train)
+
+    predictions = classifer.predict(X_test)
+
+    accuracy = accuracy_score(y_test, predictions)
+
+    print(predictions)
+    print(accuracy)
+
+
+
+
+
+
+
+    
+
+
     
 
 
